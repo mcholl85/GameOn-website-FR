@@ -1,9 +1,10 @@
 // Data-errors values { input.id: errorMsg }
 const DATA_ERRORS = {
-  first: "Veuillez entrer 2 caractères ou plus pour le champ du prénom.",
-  last: "Veuillez entrer 2 caractères ou plus pour le champ du nom.",
+  first: "Veuillez entrer un prénom valide.",
+  last: "Veuillez entrer un nom valide.",
   email: "Veuillez entrer une addresse mail valide.",
-  birthdate: "Vous devez entrer votre date de naissance valide.",
+  birthdate:
+    "Vous devez avoir 18 ans ou plus et entrer votre date de naissance valide.",
   quantity:
     "Pour le nombre de concours, une valeur numérique doit être saisie.",
   location1: "Vous devez choisir une option.",
@@ -110,8 +111,11 @@ function validateBirthdate(event) {
   const value = event.target.value;
   // date format yyyy-MM-dd
   const re = /^(19|20)\d{2}\-(0[1-9]|1[0-2])\-(0[1-9]|1\d|2\d|3[01])$/;
+  const birth = new Date(value);
+  const ageDate = new Date(Date.now() - birth.getTime());
+  const age = ageDate.getUTCFullYear() - 1970;
 
-  if (!re.test(value)) {
+  if (!re.test(value) || age < 18) {
     updateDataStatus("birthdate", "error");
   } else {
     updateDataStatus("birthdate", "valid");
@@ -199,7 +203,7 @@ function formIsValid() {
   return true;
 }
 
-// validate form
+// validate onsubmit form
 function validate(event) {
   event.preventDefault();
 
@@ -223,27 +227,6 @@ function editNav() {
   }
 }
 
-// launch modal form
-function launchModal() {
-  if (formIsValid()) {
-    // when form is valid, reset all the input valures, close the thanks messsage & open form
-    resetStatus();
-    form.reset();
-    form.style.display = "block";
-    thanks.style.display = "none";
-  }
-  // reset the page to the top, open the form & hide the body overflow
-  document.documentElement.scrollTop = 0;
-  body.classList.add("noscroll");
-  modalbg.style.display = "block";
-}
-
-// close modal form
-function closeModal() {
-  modalbg.style.display = "none";
-  body.classList.remove("noscroll");
-}
-
 // DOM Elements
 const body = document.body;
 const modalbg = document.querySelector(".bground");
@@ -263,6 +246,30 @@ const checkbox1 = document.getElementById("checkbox1");
 // launch modal event
 modalBtn.forEach((btn) => btn.addEventListener("click", launchModal));
 
+// launch modal form
+function launchModal() {
+  if (formIsValid()) {
+    // when form is valid, reset all the input valures, close the thanks messsage & open form
+    resetStatus();
+    form.reset();
+    form.style.display = "block";
+    thanks.style.display = "none";
+  }
+  // reset the page to the top, open the form & hide the body overflow
+  document.documentElement.scrollTop = 0;
+  body.classList.add("noscroll");
+  modalbg.style.display = "block";
+}
+
+// Close
+thanksClose.addEventListener("click", closeModal);
+
+// close modal form
+function closeModal() {
+  modalbg.style.display = "none";
+  body.classList.remove("noscroll");
+}
+
 // close modal event
 modalClose.addEventListener("click", closeModal);
 
@@ -275,4 +282,3 @@ birthdate.addEventListener("input", validateBirthdate);
 quantity.addEventListener("input", validateQuantity);
 city.forEach((radio) => radio.addEventListener("input", validateCity));
 checkbox1.addEventListener("input", validateCheckbox);
-thanksClose.addEventListener("click", closeModal);
